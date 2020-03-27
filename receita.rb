@@ -1,3 +1,5 @@
+require 'sqlite3'
+
 class Receita
   attr_reader :tipo_da_receita
   attr_accessor :index, :nome, :modo_de_preparo
@@ -25,7 +27,14 @@ class Receita
 
   def salvar
     self.index = Receita.todas.any? ? Receita.todas.last.index + 1 : 1
-    Receita.todas << self
+    Receita.db.execute('INSERT INTO receitas (indice, nome, tipo, modo_de_preparo)
+                        VALUES (?, ?, ?, ?)', [index, nome, tipo_da_receita, modo_de_preparo])
+  end
+
+  def self.db
+    db = SQLite3::Database.open('cookbook.db')
+    db.results_as_hash = true
+    db
   end
 
   def self.buscar(termo)
@@ -40,6 +49,10 @@ class Receita
   end
 
   def self.todas
-    @@receitas
+    receitas = db.execute('SELECT * FROM receitas')
+    receitas.map do |receita|
+      Receita.new(receita['indice'], receita['nome'], 
+                   receita['tipo'], receita['modo_de_preparo'])
+    end
   end
 end

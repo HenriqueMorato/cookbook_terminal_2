@@ -1,0 +1,14 @@
+#!/usr/bin/env ruby
+
+require 'sqlite3'
+
+db = SQLite3::Database.open('cookbook.db')
+db.execute('
+    create table if not exists receitas (
+        indice int not null,
+        nome text not null,
+        tipo text not null,
+        modo_de_preparo text not null
+    );'
+)
+db.close
