@@ -1,8 +1,10 @@
 class Receita
-  attr_reader :index, :tipo_da_receita
-  attr_accessor :nome, :modo_de_preparo
+  attr_reader :tipo_da_receita
+  attr_accessor :index, :nome, :modo_de_preparo
 
-  def initialize(index, nome, modo_de_preparo, tipo_da_receita)
+  @@receitas = []
+
+  def initialize(index = nil, nome, modo_de_preparo, tipo_da_receita)
     @index = index
     @nome = nome
     @modo_de_preparo = modo_de_preparo
@@ -19,5 +21,25 @@ class Receita
     else
       nome.downcase.include?(termo.downcase)
     end
+  end
+
+  def salvar
+    self.index = Receita.todas.any? ? Receita.todas.last.index + 1 : 1
+    Receita.todas << self
+  end
+
+  def self.buscar(termo)
+    receitas_encontradas = todas.select do |receita|
+      receita.include?(termo)
+    end
+    # Guard Clause
+    return puts "Nenhuma receita encontrada" if receitas_encontradas.empty?
+
+    puts "#{receitas_encontradas.size} receita(s) encontrada(s)"
+    puts receitas_encontradas
+  end
+
+  def self.todas
+    @@receitas
   end
 end
